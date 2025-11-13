@@ -22,6 +22,18 @@ PRIMARY KEY (`id`),
 KEY `idx_type` (`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `#__joomgallery_task_items` (
+  `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `task_id` INT(10) UNSIGNED NOT NULL,
+  `item_id` VARCHAR(255) NOT NULL,
+  `status` ENUM('pending','processing','success','failed') NOT NULL DEFAULT 'pending',
+  `error_message` TEXT DEFAULT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `processed_at` DATETIME DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `idx_task_status` (`task_id`, `status`)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
+
 ALTER TABLE `#__joomgallery_tags_ref` ADD INDEX `idx_imgid` (`imgid`);
 ALTER TABLE `#__joomgallery_tags_ref` ADD INDEX `idx_tagid` (`tagid`);
 ALTER TABLE `#__joomgallery_tags_ref` ADD INDEX `idx_tag_img` (`tagid`, `imgid`);
