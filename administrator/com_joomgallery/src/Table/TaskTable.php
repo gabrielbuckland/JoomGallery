@@ -94,26 +94,6 @@ class TaskTable extends Table
 	 */
 	public function store($updateNulls = true)
 	{
-    // Support for queue field
-    if(isset($this->queue) && !\is_string($this->queue))
-		{
-			$this->queue = \json_encode(array_values($this->queue), JSON_UNESCAPED_UNICODE);
-		}
-
-		// Support for successful field
-    if(isset($this->successful) && !\is_string($this->successful))
-		{
-      $registry = new Registry($this->successful);
-			$this->successful = (string) $registry;
-		}
-
-		// Support for failed field
-    if(isset($this->failed) && !\is_string($this->failed))
-		{
-			$registry = new Registry($this->failed);
-			$this->failed = (string) $registry;
-		}
-
     // Support for counter field
     if(isset($this->counter) && !\is_string($this->counter))
 		{
@@ -212,55 +192,6 @@ class TaskTable extends Table
    */
   public function check()
   {
-    // Support for queue field
-    if(isset($this->queue))
-    {
-      if(\is_string($this->queue))
-      {
-        if(!$queue = \json_decode($this->queue))
-        {
-          // json_decode did not work. Lets try explode()
-          $queue = \array_map('trim', \explode(',', $this->queue)) ?? [];
-        }
-        $this->queue = $queue;
-      }
-      elseif(\is_object($this->queue))
-      {
-        $this->queue = ArrayHelper::fromObject($this->queue);
-      }
-    }
-
-    // Support for successful field
-    if(isset($this->successful))
-    {
-      if(\is_string($this->successful))
-      {
-        $this->successful = \json_decode($this->successful);
-      }
-
-      if(\is_object($this->successful))
-      {
-        if($this->successful instanceof Registry)
-        {
-          $this->successful = $this->successful->toArray();
-        }
-        else
-        {
-          $this->successful = ArrayHelper::fromObject($this->successful);
-        }        
-      }
-
-      // Convert values to integer
-      $this->successful = ArrayHelper::toInteger($this->successful);
-      $this->successful = new Registry($this->successful);
-    }
-
-    // Support for failed field
-    if(isset($this->failed))
-    {
-      $this->failed = new Registry($this->failed);
-    }
-
     // Support for counter field
     if(isset($this->counter))
     {
@@ -271,10 +202,6 @@ class TaskTable extends Table
     if(isset($this->params))
     {
       $this->params = new Registry($this->params);
-    }
-    else
-    {
-      $this->params = '{}';
     }
 
     // Support for completed field
