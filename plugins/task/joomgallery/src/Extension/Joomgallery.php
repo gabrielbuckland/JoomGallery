@@ -88,6 +88,7 @@ final class Joomgallery extends CMSPlugin implements SubscriberInterface
     /** @var Task $task */
     $task       = $event->getArgument('subject');
     $params     = $event->getArgument('params');
+    $isInstant = isset($params->instant) && $params->instant === true;
     $lastStatus = $task->get('last_exit_code', Status::OK);
     $willResume = (bool) $params->resume;
     $webcron    = false;
@@ -202,7 +203,9 @@ final class Joomgallery extends CMSPlugin implements SubscriberInterface
     }
 
     // Update params
-    $this->setParams($task->get('id'), $params);
+    if (!$isInstant) {
+      $this->setParams($task->get('id'), $params);
+    }
 
     return $willResume ? Status::WILL_RESUME : Status::OK;
   }
