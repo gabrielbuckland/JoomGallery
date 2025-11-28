@@ -30,34 +30,8 @@ $wa->useStyle('com_joomgallery.admin')
    ->useScript('com_joomgallery.tasks')
    ->useStyle('com_scheduler.admin-view-tasks-css');
 
-// Add modified test-task script
-$jsPathES5 = JPATH_ROOT . '/media/com_scheduler/js/admin-view-run-test-task-es5.min.js';
-$jsPath    = JPATH_ROOT . '/media/com_scheduler/js/admin-view-run-test-task.min.js';
+$wa->useScript('com_scheduler.test-task');
 
-// Prefer the ES5 build, fall back to the modern build
-if(\is_file($jsPathES5) && \is_readable($jsPathES5))
-{
-  $jsContent = \file_get_contents($jsPathES5);
-}
-elseif(\is_file($jsPath) && \is_readable($jsPath))
-{
-  $jsContent = \file_get_contents($jsPath);
-}
-
-if($jsContent !== false && $jsContent !== '')
-{
-  $jsContent = \str_replace(
-      '?option=com_scheduler&view=tasks',
-      '?option=com_joomgallery&view=tasks',
-      $jsContent
-  );
-
-  $wa->addInlineScript($jsContent, ['name' => 'com_scheduler.test-task']);
-}
-else
-{
-  $wa->useScript('com_scheduler.test-task');
-}
 
 // Add language strings to JS
 Text::script('COM_SCHEDULER_TEST_RUN_TITLE');
@@ -304,10 +278,23 @@ if($saveOrder && !empty($this->items))
               </td>
 
               <!-- Run task -->
+<!--              <td class="small d-none d-md-table-cell">-->
+<!--                <button type="button" class="btn btn-sm btn-warning" --><?php //echo $item->state < 0 ? 'disabled' : ''; ?><!-- data-id="--><?php //echo (int) $item->id; ?><!--" data-title="--><?php //echo htmlspecialchars($item->title); ?><!--" data-bs-toggle="modal" data-bs-backdrop="static" data-bs-target="#scheduler-test-modal">-->
+<!--                  <span class="fa fa-play fa-sm me-2"></span>-->
+<!--                  --><?php //echo Text::_('COM_JOOMGALLERY_TASK_START_SCHEDULER_TASK'); ?>
+<!--                </button>-->
+<!--              </td>-->
+
               <td class="small d-none d-md-table-cell">
-                <button type="button" class="btn btn-sm btn-warning" <?php echo $item->state < 0 ? 'disabled' : ''; ?> data-id="<?php echo (int) $item->id; ?>" data-title="<?php echo htmlspecialchars($item->title); ?>" data-bs-toggle="modal" data-bs-backdrop="static" data-bs-target="#scheduler-test-modal">
+                <button type="button"
+                        class="btn btn-sm btn-warning"
+                        data-scheduler-run
+                        data-id="<?php echo (int) $item->id; ?>"
+                        data-title="<?php echo $this->escape($item->title); ?>"
+                        data-url="<?php echo Route::_('index.php?option=com_ajax&format=json&plugin=RunSchedulerTest&group=system&id=' . (int) $item->id) . '&t=' . time(); ?>"
+                        title="<?php echo Text::_('COM_JOOMGALLERY_TASK_START_SCHEDULER_TASK'); ?>">
                   <span class="fa fa-play fa-sm me-2"></span>
-                  <?php echo Text::_('COM_JOOMGALLERY_TASK_START_SCHEDULER_TASK'); ?>
+                  <?php echo Text::_('Run'); ?>
                 </button>
               </td>
 
